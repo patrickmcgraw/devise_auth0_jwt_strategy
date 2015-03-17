@@ -1,6 +1,7 @@
 module DeviseAuth0JwtStrategy
   class Railtie < Rails::Railtie
-    initializer "devise_auth0_jwt_strategy.configure_rails_initialization" do
+    #initializer "devise_auth0_jwt_strategy.configure_rails_initialization" do
+    config.after_initialize do
       print "Wiring up Auth0 JWT Devise Strategy..."
       if ENV['AUTH0_CLIENT_SECRET']
 
@@ -16,8 +17,8 @@ module DeviseAuth0JwtStrategy
         print "done.\n"
 
       else
-        print " no Auth0 Secret Found. Skipping..."
-
+        print " no Auth0 Secret Found. Skipping...\n"
+        puts ENV.inspect
       end
 
     end
