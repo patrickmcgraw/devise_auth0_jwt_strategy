@@ -7,7 +7,8 @@ Gem::Specification.new do |gem|
   gem.authors       = ["Patrick McGraw"]
   gem.email         = 'patrick@mcgraw-tech.com'
   gem.files         = [ "lib/devise_auth0_jwt_strategy.rb",
-                        "lib/devise_auth0_jwt_strategy/strategy.rb" ]
+                        "lib/devise_auth0_jwt_strategy/strategy.rb",
+                        "lib/devise_auth0_jwt_strategy/railtie.rb" ]
   gem.homepage      = 'http://rubygems.org/gems/devise_auth0_jwt_strategy'
   gem.license       = 'MIT'
   gem.require_paths = ['lib']
