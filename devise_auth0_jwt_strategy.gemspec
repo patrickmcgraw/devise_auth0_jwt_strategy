@@ -2,7 +2,7 @@ Gem::Specification.new do |gem|
   gem.name          = 'devise_auth0_jwt_strategy'
   gem.version       = '0.0.1'
   gem.date          = '2015-03-10'
-  gem.summary       = "Authenticate requests using an Aith0 JWT passed by HTTP header"
+  gem.summary       = "Authenticate requests using an Auth0 JWT passed by HTTP header"
   gem.description   = gem.summary
   gem.authors       = ["Patrick McGraw"]
   gem.email         = 'patrick@mcgraw-tech.com'
