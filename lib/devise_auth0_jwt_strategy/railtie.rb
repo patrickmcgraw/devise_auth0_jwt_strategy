@@ -18,7 +18,7 @@ module DeviseAuth0JwtStrategy
 
       else
         print " no Auth0 Secret Found. Skipping...\n"
-        puts ENV.inspect
+
       end
 
     end
