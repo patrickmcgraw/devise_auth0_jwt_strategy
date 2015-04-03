@@ -48,15 +48,25 @@ module Devise
 
       def authenticate!
 
+        if ENV['DEBUG_AUTH0_JWT']
+          STDERR.puts ">>>>>>>>>>>>>>> DEBUG AUTH0 JWT"
+          STDERR.puts "valid? #{valid?}"
+          STDERR.puts @jwt_token
+        end
+
         if valid?
           # This will throw JWT::DecodeError if it fails
           payload, header = ::JWT.decode(@jwt_token,
             ::JWT.base64url_decode(auth0_client_secret))
 
+          STDERR.puts payload.inspect if ENV['DEBUG_AUTH0_JWT']
+
           raise ClaimInvalid.new('JWT has the wrong client id') unless payload['aud'] == auth0_client_id
           raise ClaimInvalid.new('JWT has expired') unless payload['exp'].to_i > Time.now.to_i
 
           u = ::User.find_by_email(payload['email'])
+
+          STDERR.puts "payload['email']=#{payload['email']} user.email=#{u.try(:email)}"
 
           u.nil? ? fail!("Could not log in") : success!(u)
 
@@ -69,7 +79,7 @@ module Devise
         fail! e.message
 
       rescue ::JWT::DecodeError => e
-        puts "JWT::DecodeError -- #{e.message}"
+        STDERR.puts "JWT::DecodeError -- #{e.message}"
         fail!("JWT token is invalid. Please get a new token and try again.")
       end
 
