@@ -1,19 +1,20 @@
 module DeviseAuth0JwtStrategy
   class Railtie < Rails::Railtie
-    #initializer "devise_auth0_jwt_strategy.configure_rails_initialization" do
-    config.after_initialize do
+    initializer "devise_auth0_jwt_strategy.configure_rails_initialization" do
       print "Wiring up Auth0 JWT Devise Strategy..."
-      if ENV['AUTH0_CLIENT_SECRET']
 
-        Warden::Strategies.add(:auth0jwt, Devise::Strategies::Auth0Jwt)
-        Devise.add_module(:auth0jwt, strategy: true, controller: :sessions)
+      ::Devise.setup do |config|
 
-        print "done.\n"
+        config.warden do |manager|
+          manager.strategies.add(:auth0jwt, ::Devise::Strategies::Auth0Jwt)
+          manager.default_strategies(:scope => :user).unshift :auth0jwt
 
-      else
-        print " no Auth0 Secret Found. Skipping...\n"
+          puts manager.default_strategies.inspect
+        end
 
       end
+
+      print "done.\n"
 
     end
   end
