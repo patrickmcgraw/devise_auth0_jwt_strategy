@@ -9,7 +9,7 @@ module DeviseAuth0JwtStrategy
           manager.strategies.add(:auth0jwt, ::Devise::Strategies::Auth0Jwt)
           manager.default_strategies(:scope => :user).unshift :auth0jwt
 
-          puts manager.default_strategies.inspect
+          puts manager.default_strategies(:scope => :user).inspect
         end
 
       end
