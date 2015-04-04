@@ -13,8 +13,8 @@ Gem::Specification.new do |gem|
   gem.license       = 'MIT'
   gem.require_paths = ['lib']
 
-  gem.add_dependency 'jwt', '~> 1.0.0'
-  gem.add_dependency 'devise', '~> 3.4.1'
+  gem.add_dependency 'jwt', '~> 1.0'
+  gem.add_dependency 'devise', '~> 3.4'
 
   gem.add_development_dependency 'rails', '>= 4.0.0'
   gem.add_development_dependency 'rspec-rails', '~> 3.0'
