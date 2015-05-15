@@ -66,9 +66,14 @@ module Devise
 
           u = ::User.find_by_email(payload['email'])
 
-          STDERR.puts "payload['email']=#{payload['email']} user.email=#{u.try(:email)}"
+          if u.nil?
+            fail!("Could not log in")
 
-          u.nil? ? fail!("Could not log in") : success!(u)
+          else
+            u.ignore_timedout = true if u.respond_to?(:ignore_timedout=)
+            success!(u)
+
+          end
 
         else
           fail("No JWT token passed in")

@@ -227,7 +227,7 @@ RSpec.describe Devise::Strategies::Auth0Jwt do
         end
 
         it "should fail! the authentication" do
-          STDOUT.should_receive(:puts).with("JWT::DecodeError -- Token Invalid")
+          STDERR.should_receive(:puts).with("JWT::DecodeError -- Token Invalid")
           subject.should_receive(:fail!).with("JWT token is invalid. Please get a new token and try again.")
           subject.authenticate!
         end
