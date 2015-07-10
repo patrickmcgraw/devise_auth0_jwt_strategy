@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    devise_auth0_jwt_strategy (0.0.5)
+    devise_auth0_jwt_strategy (0.0.6)
       devise (~> 3.4)
       jwt (~> 1.0)
 

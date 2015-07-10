@@ -11,6 +11,7 @@ RSpec.describe Devise::Strategies::Auth0Jwt do
   it { should respond_to :auth0_client_id? }
   it { should respond_to :valid_jwt_auth_header? }
   it { should respond_to :jwt_from_auth_header }
+  it { should respond_to :store? }
   it { should respond_to :valid? }
   it { should respond_to :authenticate! }
 
@@ -154,6 +155,12 @@ RSpec.describe Devise::Strategies::Auth0Jwt do
           subject.jwt_token.should == 'mah token'
         end
       end
+    end
+  end
+
+  describe "#store?" do
+    it "returns false" do
+      expect(subject.store?).to eql(false)
     end
   end
 

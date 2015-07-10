@@ -42,6 +42,11 @@ module Devise
         @jwt_token ||= ( params['jwt'] || jwt_from_auth_header )
       end
 
+      # This login should be required on each request and not setup a session
+      def store?
+        false
+      end
+
       def valid?
         ( auth0_client_secret? and auth0_client_id? and !!jwt_token )
       end
