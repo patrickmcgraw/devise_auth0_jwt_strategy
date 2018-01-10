@@ -69,7 +69,7 @@ module Devise
           raise ClaimInvalid.new('JWT has the wrong client id') unless payload['aud'] == auth0_client_id
           raise ClaimInvalid.new('JWT has expired') unless payload['exp'].to_i > Time.now.to_i
 
-          u = ::User.find_by_email(payload['email'])
+          u = ::User.find_for_devise_auth0_jwt_strategy(payload['email'])
 
           if u.nil?
             fail!("Could not log in")

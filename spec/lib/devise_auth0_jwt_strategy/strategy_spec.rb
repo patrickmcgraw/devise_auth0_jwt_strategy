@@ -272,8 +272,8 @@ RSpec.describe Devise::Strategies::Auth0Jwt do
           context "when the token is not expired" do
             let(:mock_time) { (Time.zone.now + 15.days).to_i }
 
-            context "when the user cannot be found by email" do
-              before { expect(::User).to receive(:find_by_email).with('bob@isyouruncle.com').and_return(nil) }
+            context "when the user cannot be found" do
+              before { expect(::User).to receive(:find_for_devise_auth0_jwt_strategy).with('bob@isyouruncle.com').and_return(nil) }
 
               it "should fail! the authentication" do
                 expect(subject).to receive(:fail!).with("Could not log in")
@@ -283,7 +283,7 @@ RSpec.describe Devise::Strategies::Auth0Jwt do
 
             context "when the user is found by email" do
               let(:mock_user) { double(User) }
-              before { expect(::User).to receive(:find_by_email).with('bob@isyouruncle.com').and_return(mock_user) }
+              before { expect(::User).to receive(:find_for_devise_auth0_jwt_strategy).with('bob@isyouruncle.com').and_return(mock_user) }
 
               it "should success! the authentication" do
                 expect(subject).to receive(:success!).with(mock_user)
