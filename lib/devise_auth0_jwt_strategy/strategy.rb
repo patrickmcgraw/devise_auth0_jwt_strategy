@@ -51,6 +51,20 @@ module Devise
         ( auth0_client_secret? and auth0_client_id? and !!jwt_token )
       end
 
+      def to_boolean(value)
+        # Most calls to this will pass in nil so have this guard clause first
+        # as a performance optimization
+        return false if value.nil?
+
+        # We interpret a boolean true or the lowercase normalize strings 'true', and 't'
+        # as a true value
+        return value if value == !!value
+        return !!(['true', 't'].index(value.downcase)) if value.kind_of?(::String)
+
+        # All others are always false
+        return false
+      end
+
       def authenticate!
 
         if ENV['DEBUG_AUTH0_JWT']
@@ -76,6 +90,7 @@ module Devise
 
           else
             u.ignore_timedout = true if u.respond_to?(:ignore_timedout=)
+            u.ignore_active = to_boolean(payload['ignore_active']) if u.respond_to?(:ignore_active=)
             success!(u)
 
           end

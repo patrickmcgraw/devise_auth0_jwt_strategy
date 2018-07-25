@@ -206,6 +206,50 @@ RSpec.describe Devise::Strategies::Auth0Jwt do
     end
   end
 
+  describe "#to_boolean" do
+    context "when value is nil" do
+      it "returns false" do
+        expect(subject.to_boolean(nil)).to eq(false)
+      end
+    end
+
+    context "when value is false" do
+      it "returns false" do
+        expect(subject.to_boolean(false)).to eq(false)
+      end
+    end
+
+    context "when value is true" do
+      it "returns true" do
+        expect(subject.to_boolean(true)).to eq(true)
+      end
+    end
+
+    ['true', 't'].each do |truthy_string|
+      context "when value is '#{truthy_string}'" do
+        it "returns true" do
+          expect(subject.to_boolean(truthy_string)).to eq(true)
+        end
+      end
+    end
+
+    ['false', 'f', 'fizzbuzz', 'rails'].each do |falsey_string|
+      context "when value is '#{falsey_string}'" do
+        it "returns false" do
+          expect(subject.to_boolean(falsey_string)).to eq(false)
+        end
+      end
+    end
+
+    [Date.current, Time.zone.now, 1001].each do |falsey_value|
+      context "when value is #{falsey_value}" do
+        it "returns false" do
+          expect(subject.to_boolean(falsey_value)).to eq(false)
+        end
+      end
+    end
+  end
+
   describe "#authenticate!" do
     context "when the request is not valid for auth0jwt strategy" do
       before { expect(subject).to receive(:valid?).and_return(false) }
@@ -244,7 +288,7 @@ RSpec.describe Devise::Strategies::Auth0Jwt do
         before do
           expect(::JWT).to receive(:decode).
             with('Mah-Token', 'mah_secret_no_base64').
-            and_return([{'aud' => mock_aud, 'email' => 'bob@isyouruncle.com', 'exp' => mock_time}, 'some header'])
+            and_return([{'aud' => mock_aud, 'email' => 'bob@isyouruncle.com', 'exp' => mock_time, 'ignore_active' => 'true'}, 'some header'])
         end
 
         context "when aud is from the wrong client ID" do
@@ -282,12 +326,15 @@ RSpec.describe Devise::Strategies::Auth0Jwt do
             end
 
             context "when the user is found by email" do
-              let(:mock_user) { double(User) }
+              let(:mock_user) { User.new }
               before { expect(::User).to receive(:find_for_devise_auth0_jwt_strategy).with('bob@isyouruncle.com').and_return(mock_user) }
 
               it "should success! the authentication" do
                 expect(subject).to receive(:success!).with(mock_user)
                 subject.authenticate!
+
+                expect(mock_user.ignore_timedout).to eq(true)
+                expect(mock_user.ignore_active).to eq(true)
               end
             end
           end
