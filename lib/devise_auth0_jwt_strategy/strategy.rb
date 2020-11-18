@@ -1,5 +1,6 @@
 require 'jwt'
 require 'devise'
+require "request_store"
 
 module Devise
   module Strategies
@@ -91,6 +92,9 @@ module Devise
           else
             u.ignore_timedout = true if u.respond_to?(:ignore_timedout=)
             u.ignore_active = to_boolean(payload['ignore_active']) if u.respond_to?(:ignore_active=)
+
+            ::RequestStore.store[:jwt_scopes] = payload['scopes']
+
             success!(u)
 
           end
