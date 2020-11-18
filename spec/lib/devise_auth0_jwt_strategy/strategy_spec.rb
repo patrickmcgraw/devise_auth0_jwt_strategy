@@ -258,6 +258,8 @@ RSpec.describe Devise::Strategies::Auth0Jwt do
         expect(::JWT).to_not receive(:decode)
         expect(subject).to receive(:fail).with("No JWT token passed in")
         subject.authenticate!
+
+        expect(::RequestStore.store[:jwt_scopes]).to be_nil
       end
     end
 
@@ -281,6 +283,8 @@ RSpec.describe Devise::Strategies::Auth0Jwt do
           expect(STDERR).to receive(:puts).with("JWT::DecodeError -- Token Invalid")
           expect(subject).to receive(:fail!).with("JWT token is invalid. Please get a new token and try again.")
           subject.authenticate!
+
+          expect(::RequestStore.store[:jwt_scopes]).to be_nil
         end
       end
 
@@ -288,8 +292,10 @@ RSpec.describe Devise::Strategies::Auth0Jwt do
         before do
           expect(::JWT).to receive(:decode).
             with('Mah-Token', 'mah_secret_no_base64').
-            and_return([{'aud' => mock_aud, 'email' => 'bob@isyouruncle.com', 'exp' => mock_time, 'ignore_active' => 'true'}, 'some header'])
+            and_return([{'aud' => mock_aud, 'email' => 'bob@isyouruncle.com', 'exp' => mock_time, 'ignore_active' => 'true', 'scopes' => mock_scope}, 'some header'])
         end
+
+        let(:mock_scope) { nil }
 
         context "when aud is from the wrong client ID" do
           let(:mock_aud) { 'some wrong id' }
@@ -298,6 +304,8 @@ RSpec.describe Devise::Strategies::Auth0Jwt do
           it "should fail! the authentication" do
             expect(subject).to receive(:fail!).with("JWT has the wrong client id")
             subject.authenticate!
+
+            expect(::RequestStore.store[:jwt_scopes]).to be_nil
           end
         end
 
@@ -310,6 +318,8 @@ RSpec.describe Devise::Strategies::Auth0Jwt do
             it "should fail! the authentication" do
               expect(subject).to receive(:fail!).with("JWT has expired")
               subject.authenticate!
+
+              expect(::RequestStore.store[:jwt_scopes]).to be_nil
             end
           end
 
@@ -322,6 +332,8 @@ RSpec.describe Devise::Strategies::Auth0Jwt do
               it "should fail! the authentication" do
                 expect(subject).to receive(:fail!).with("Could not log in")
                 subject.authenticate!
+
+                expect(::RequestStore.store[:jwt_scopes]).to be_nil
               end
             end
 
@@ -335,8 +347,26 @@ RSpec.describe Devise::Strategies::Auth0Jwt do
 
                 expect(mock_user.ignore_timedout).to eq(true)
                 expect(mock_user.ignore_active).to eq(true)
+
+                expect(::RequestStore.store[:jwt_scopes]).to be_nil
+              end
+
+              context "when the payload contains jwt_scopes" do
+                let(:mock_scope) { 'mock_scope' }
+
+                it "should success! the authentication" do
+                  expect(subject).to receive(:success!).with(mock_user)
+                  subject.authenticate!
+
+                  expect(mock_user.ignore_timedout).to eq(true)
+                  expect(mock_user.ignore_active).to eq(true)
+
+                  expect(::RequestStore.store[:jwt_scopes]).to_not be_nil
+                  expect(::RequestStore.store[:jwt_scopes]).to eq "mock_scope"
+                end
               end
             end
+
           end
         end
       end
