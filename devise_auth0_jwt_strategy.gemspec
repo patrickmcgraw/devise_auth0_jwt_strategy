@@ -1,6 +1,6 @@
 Gem::Specification.new do |gem|
   gem.name          = 'devise_auth0_jwt_strategy'
-  gem.version       = '0.0.9'
+  gem.version       = '0.0.10'
   gem.date          = '2015-03-10'
   gem.summary       = "Authenticate requests using an Auth0 JWT passed by HTTP header"
   gem.description   = gem.summary
@@ -15,6 +15,7 @@ Gem::Specification.new do |gem|
 
   gem.add_dependency 'jwt', '~> 1.5'
   gem.add_dependency 'devise', '>= 3.4'
+  gem.add_dependency 'request_store', '~> 1.3'
 
   gem.add_development_dependency 'rails', '>= 5.0.0'
   gem.add_development_dependency 'rspec-rails', '~> 3.7'
