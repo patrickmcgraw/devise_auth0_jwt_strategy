@@ -269,7 +269,7 @@ RSpec.describe Devise::Strategies::Auth0Jwt do
         ENV['AUTH0_CLIENT_SECRET'] = 'mah_secret'
         subject.instance_variable_set(:"@jwt_token", 'Mah-Token')
         expect(subject).to receive(:valid?).and_return(true)
-        expect(::JWT).to receive(:base64url_decode).with('mah_secret').and_return('mah_secret_no_base64')
+        expect(::JWT::Base64).to receive(:url_decode).with('mah_secret').and_return('mah_secret_no_base64')
       end
 
       context "when the JWT decode fails" do

@@ -77,7 +77,7 @@ module Devise
         if valid?
           # This will throw JWT::DecodeError if it fails
           payload, header = ::JWT.decode(@jwt_token,
-            ::JWT.base64url_decode(auth0_client_secret))
+          ::JWT::Base64.url_decode(auth0_client_secret))
 
           STDERR.puts payload.inspect if ENV['DEBUG_AUTH0_JWT']
 
