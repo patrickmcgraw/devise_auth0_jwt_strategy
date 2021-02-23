@@ -264,23 +264,35 @@ RSpec.describe Devise::Strategies::Auth0Jwt do
     end
 
     context "when the request is valid for auth0jwt strategy" do
+      let(:payload) do
+        {
+          'aud' => mock_aud,
+          'email' => 'bob@isyouruncle.com',
+          'exp' => mock_time,
+          'ignore_active' => 'true',
+          'scopes' => mock_scope
+        }
+      end
+
       before do
         ENV['AUTH0_CLIENT_ID'] = 'mah_id'
         ENV['AUTH0_CLIENT_SECRET'] = 'mah_secret'
-        subject.instance_variable_set(:"@jwt_token", 'Mah-Token')
-        expect(subject).to receive(:valid?).and_return(true)
-        expect(::JWT::Base64).to receive(:url_decode).with('mah_secret').and_return('mah_secret_no_base64')
+        # expect(subject).to receive(:valid?).and_return(true)
       end
 
       context "when the JWT decode fails" do
+        let(:mock_aud) { 'mah_id' }
+        let(:mock_time) { (Time.zone.now + 15.days).to_i }
+        let(:mock_scope) { 'mock_scope' }
         before do
-          expect(::JWT).to receive(:decode).
-            with('Mah-Token', 'mah_secret_no_base64').
-            and_raise(::JWT::DecodeError.new('Token Invalid'))
+          subject.instance_variable_set(
+            :"@jwt_token",
+            ::JWT.encode(payload, 'not_mah_secret', 'HS256', { typ: 'JWT' })
+          )
         end
 
         it "should fail! the authentication" do
-          expect(STDERR).to receive(:puts).with("JWT::DecodeError -- Token Invalid")
+          expect(STDERR).to receive(:puts).with("JWT::DecodeError -- Signature verification raised")
           expect(subject).to receive(:fail!).with("JWT token is invalid. Please get a new token and try again.")
           subject.authenticate!
 
@@ -290,9 +302,10 @@ RSpec.describe Devise::Strategies::Auth0Jwt do
 
       context "when the JWT decode succeeds" do
         before do
-          expect(::JWT).to receive(:decode).
-            with('Mah-Token', 'mah_secret_no_base64').
-            and_return([{'aud' => mock_aud, 'email' => 'bob@isyouruncle.com', 'exp' => mock_time, 'ignore_active' => 'true', 'scopes' => mock_scope}, 'some header'])
+          subject.instance_variable_set(
+            :"@jwt_token",
+            ::JWT.encode(payload, 'mah_secret', 'HS256', { typ: 'JWT' })
+          )
         end
 
         let(:mock_scope) { nil }

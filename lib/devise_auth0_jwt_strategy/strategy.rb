@@ -66,6 +66,19 @@ module Devise
         return false
       end
 
+      def decode_options
+        # We will continue doing our own claim checks just for backwards compatibility
+        {
+          verify_expiration: false,
+          verify_iat: false,
+          verify_iss: false,
+          verify_aud: false,
+          verify_jti: false,
+          verify_subj: false,
+          verify_not_before: false
+        }
+      end
+
       def authenticate!
 
         if ENV['DEBUG_AUTH0_JWT']
@@ -75,9 +88,9 @@ module Devise
         end
 
         if valid?
+          # Passing true will cause #decode to verify the token signature
           # This will throw JWT::DecodeError if it fails
-          payload, header = ::JWT.decode(@jwt_token,
-          ::JWT::Base64.url_decode(auth0_client_secret))
+          payload, header = ::JWT.decode(@jwt_token, auth0_client_secret, true, decode_options)
 
           STDERR.puts payload.inspect if ENV['DEBUG_AUTH0_JWT']
 
